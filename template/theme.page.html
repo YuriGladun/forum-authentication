@@ -1,0 +1,153 @@
+{{template "body" .}}
+
+{{define "style"}}
+    
+{{end}}
+{{define "centralPart"}}
+{{$threadID :=index .Data "mainThreadID"}}
+{{$loggedID := index .Data "loggedAsID"}}
+<div class="container custom-container">
+ 
+  <table class="table-borderless forumTable whiteLink mt-3">
+    <thead class="containerHead">
+      <tr>
+        <!-- Colling Modal -->
+        {{ if $threadID}}
+        <div class="d-flex justify-content-start align-items-center">
+        {{ if ne 1 $loggedID}}
+          <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#createNewPostModal">Create New Post</button>
+        {{end}}  
+        </div>
+        {{ end }}
+        <div class="d-flex justify-content-center">
+        </div>
+        <!-- End -->
+         <!-- Modal starts -->
+         <div class="modal fade text-bg-dark p-3" id="createNewPostModal" tabindex="-1" aria-labelledby="createNewPostModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createNewPostModalLabel">Type your post and click "Post"</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="post" action="" enctype="multipart/form-data">
+                  <div class="mb-3">
+                    <label for="post-text" class="col-form-label">Type your topic here:</label>
+                    <textarea class="form-control" id="post-text" name="post-text"></textarea>
+                  </div>
+
+                  <div class="mb-3">
+                      <label for="image" class="col-form-label">Image: (Max 2 MB), allowed formats jpeg, png, gif.</label>
+                      <input type="file" class="form-control" name="image" id="image">
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-light">Post</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal ends -->
+        {{$creatorImage := index .Data "creatorImg"}}
+        {{$creatorName := index .Data "creatorName"}}
+        {{$creatorID := index .Data "creatorID"}}
+
+        {{if $creatorID}}
+        <th class="forumFirstColTheme" scope="col" colspan="2">
+          <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
+          <br><a href="/personal_cabinet?userID={{$creatorID}}"><strong>&nbsp;{{$creatorName}}</strong></a><br>
+          Date of Registration:<br>{{index .Data "creatorRegistrationDate"}} <br>
+          Total Messages: {{index .Data "creatorPostsAmmount"}}
+
+        </th>
+       
+        <!-- Topic starts here -->
+        <th>
+          <div id="mainTheme">
+            <h3>Topic:</h3>
+            <hr>
+            {{$threadImage := index .Data "threadImg"}}
+            {{ if $threadImage  }}
+              <img src="{{$threadImage }}" class="post_img" alt="post_img">
+            {{ end }} <br><br>
+            {{index .Data "mainThreadName"}} <br>
+
+            {{ if and (ne $loggedID 1) (eq $creatorID $loggedID) }}
+            <form method="POST" action="/edit_topic?topicID={{$threadID}}">
+              <input type="hidden" name="topic_id" value="{{$threadID }}">
+              <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; 
+              text-decoration: underline; color:inherit;">✍🏻 Edit</button>
+            </form>
+            {{end}}
+            <hr>
+            Created: {{index .Data "mainThreadCreatedTime"}}
+          </div>
+
+        </th>
+        <!-- Topic ends here -->
+
+      </tr>
+
+    </thead>
+    {{end}}
+    <!-- posts start here -->
+    <tbody class="containerBody">
+      {{$postinfo := index .Data "posts"}}
+      {{ range $postinfo }}
+      {{$postCreatorID := .UserIDWhoCreatedPost}}
+      {{ if or (eq $postCreatorID $loggedID) (eq .Classification "approved") }}
+
+          <tr>
+            <td>
+              <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
+              <br><a href="/personal_cabinet?userID={{ .UserIDWhoCreatedPost}}"><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong></a><br>
+              Date of Registration:<br>{{ .UserRegistrationDate}} <br>
+              Total Messages: {{ .UserPostsAmmount}}
+            </td>
+            <td>
+            </td>
+            <td>
+              <em>{{ .Subject}}</em> <br><br>
+
+              {{ if .Image }}
+                  <img src="{{ .Image }}" class="post_img" alt="post_img">
+              {{ end }} <br><br>
+
+              {{ .Content }}&nbsp;
+              {{ if and (ne $loggedID 1) (eq $postCreatorID $loggedID) }}
+                <form method="POST" action="/edit_post?postID={{ .ID}}">
+                  <input type="hidden" name="topic_id" value="{{ .ID }}">
+                  <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; 
+                  text-decoration: underline; color:inherit;">✍🏻 Edit / Delete</button>
+                </form>
+                {{end}}
+              <br>
+              Posted: {{ .Created }}<br>
+              <div class="d-flex justify-content-start align-items-center">
+              {{ if ne 1 $loggedID}}
+                <form method="POST" action="">
+                  <input type="hidden" name="like" value="{{ .ID }}">
+                  <button type="submit" class="btn btn-success btn-sm mr-2">Like👍&nbsp;{{ .Likes }}</button>
+                </form>
+                &nbsp;&nbsp;
+                <form method="POST" action="">
+                  <input type="hidden" name="dislike" value="{{ .ID }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Dislike👎&nbsp;{{ .Dislikes }}</button>
+                </form>
+                {{ end }}
+              </div>
+              <hr>
+            </td>
+          </tr>
+          {{ end }}
+      {{ end }}
+      <!-- posts end here -->
+    </tbody>
+  </table>
+</div>
+</div>
+{{end}}

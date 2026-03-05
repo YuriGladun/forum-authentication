@@ -1,0 +1,48 @@
+{{template "body" .}}
+
+{{define "centralPart"}}
+
+<div class="container">
+    {{$res := index .Data "loginData"}}
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Login</h1>
+            <form action="" method="post">
+                <div class="mb-3">
+                    <label for="emailLogIn" class="col-form-label">Email</label>
+                    {{with .Form.Errors.Get "emailLogIn"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input class="form-control" type="email" name="emailLogIn" id="emailLogIn">
+                </div>
+                <div class="mb-3">
+                    <label for="passwordLogIn" class="col-form-label">Password</label>
+                    {{with .Form.Errors.Get "passwordLogIn"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn"
+                        placeholder="Password">
+                </div>
+                <p><button type="submit" class="btn btn-light">Login</button></p>
+            </form>
+            <form action="" method="post">
+                <!-- Hidden input field with pre-filled data -->
+                <input type="hidden" name="emailLogIn" value="guest@gmail.com">
+                <input type="hidden" name="passwordLogIn" value="123456">
+
+                <!-- Button for submitting the form -->
+                <hr>
+                <p>Other login options:</p>
+                <p><button type="submit" class="btn btn-secondary">Enter  As Guest </button></p>
+            </form>
+            
+
+            <p><a class="btn btn-light" href="/login-github" role="button">Login with <img src="./static/logo/GHub.png" alt="GHub_picture" style="width: 5em;"></a></p>
+
+            <p><a class="btn btn-light" href="/login-google" role="button">Login with <img src="./static/logo/G.png" alt="G-letter" style="height: 1em;">oggle</a></p>
+
+        </div>
+    </div>
+</div>
+</div>
+{{end}}
